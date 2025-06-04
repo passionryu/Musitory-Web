@@ -1,85 +1,101 @@
 "use client"
 
-import { useState, type ReactNode } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Heart, Play } from "lucide-react"
+import MusicDetailModal from "./music-detail-modal"
+import type { Music } from "@/types/music"
 
-interface MusicCarouselProps<T> {
-  items: T[]
-  renderItem: (item: T) => ReactNode
-  visibleItems?: number
-  mobileVisibleItems?: number
+interface MusicCarouselProps {
+  music: Music[]
 }
 
-export default function MusicCarousel<T>({
-  items,
-  renderItem,
-  visibleItems = 6,
-  mobileVisibleItems = 2.5,
-}: MusicCarouselProps<T>) {
-  const [startIndex, setStartIndex] = useState(0)
+function formatTimeAgo(timestamp: string): string {
+  try {
+    const date = new Date(timestamp)
+    if (isNaN(date.getTime())) {
+      return "방금 전"
+    }
 
-  const handlePrev = () => {
-    setStartIndex((prev) => (prev === 0 ? Math.max(0, items.length - visibleItems) : prev - 1))
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (diffInSeconds < 60) return "방금 전"
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}분 전`
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}시간 전`
+    return `${Math.floor(diffInSeconds / 86400)}일 전`
+  } catch {
+    return "방금 전"
   }
+}
 
-  const handleNext = () => {
-    setStartIndex((prev) => (prev >= items.length - visibleItems ? 0 : prev + 1))
+export default function MusicCarousel({ music }: MusicCarouselProps) {
+  const [selectedMusic, setSelectedMusic] = useState<Music | null>(null)
+  const [musicList, setMusicList] = useState(music)
+
+  const handleLike = (musicId: string) => {
+    setMusicList((prev) => prev.map((item) => (item.id === musicId ? { ...item, likes: item.likes + 1 } : item)))
   }
-
-  const visibleItemsArray = items.slice(startIndex, startIndex + visibleItems)
 
   return (
-    <div className="relative">
-      {/* Desktop version with arrows */}
-      <div className="hidden md:flex items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-0 z-10 bg-slate-100/90 text-slate-600 rounded-full hover:bg-slate-200 border border-slate-300 shadow-sm"
-          onClick={handlePrev}
-        >
-          <ChevronLeft className="h-5 w-5" />
-          <span className="sr-only">Previous</span>
-        </Button>
+    <>
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex gap-4 pb-4" style={{ width: "max-content" }}>
+          {musicList.map((item) => (
+            <Card
+              key={item.id}
+              className="flex-shrink-0 w-48 sm:w-56 bg-white/70 backdrop-blur-sm border-slate-200 p-3 hover:bg-white/80 transition-all duration-300 cursor-pointer group"
+              onClick={() => setSelectedMusic(item)}
+            >
+              <div className="space-y-3">
+                <div className="relative">
+                  <img
+                    src={item.thumbnail || "/placeholder.svg"}
+                    alt={item.title}
+                    className="w-full h-32 sm:h-36 object-cover rounded-lg"
+                  />
+                  <Button
+                    size="sm"
+                    className="absolute bottom-2 right-2 bg-slate-700/80 hover:bg-slate-800 text-white w-8 h-8 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      // Handle play functionality
+                    }}
+                  >
+                    <Play className="h-3 w-3 fill-current" />
+                  </Button>
+                </div>
 
-        <div className="flex gap-3 overflow-hidden mx-10 py-4">
-          <div className="flex gap-3 transition-transform duration-500 ease-in-out">
-            {visibleItemsArray.map((item, index) => (
-              <div key={startIndex + index} className="flex-shrink-0">
-                {renderItem(item)}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-slate-800 text-sm line-clamp-2">{item.title}</h3>
+                  <p className="text-slate-600 text-xs">{item.artist}</p>
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span>{item.genre}</span>
+                    <div className="flex items-center gap-1 text-red-500">
+                      <Heart className="h-3 w-3 fill-current" />
+                      <span>{item.likes}</span>
+                    </div>
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    <p>by {item.uploader}</p>
+                    <p>{formatTimeAgo(item.timestamp)}</p>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-0 z-10 bg-slate-100/90 text-slate-600 rounded-full hover:bg-slate-200 border border-slate-300 shadow-sm"
-          onClick={handleNext}
-        >
-          <ChevronRight className="h-5 w-5" />
-          <span className="sr-only">Next</span>
-        </Button>
-      </div>
-
-      {/* Mobile version with horizontal scroll */}
-      <div className="md:hidden">
-        <div
-          className="flex gap-3 overflow-x-auto py-4 px-4 scrollbar-hide"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
-        >
-          {items.map((item, index) => (
-            <div key={index} className="flex-shrink-0">
-              {renderItem(item)}
-            </div>
+            </Card>
           ))}
         </div>
       </div>
-    </div>
+
+      {selectedMusic && (
+        <MusicDetailModal
+          music={selectedMusic}
+          isOpen={!!selectedMusic}
+          onClose={() => setSelectedMusic(null)}
+          onLike={handleLike}
+        />
+      )}
+    </>
   )
 }
