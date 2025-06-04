@@ -1,7 +1,6 @@
 import MostLikedMusic from "@/components/most-liked-music"
 import RecentMusic from "@/components/recent-music"
 import RecommendationsForOthers from "@/components/recommendations-for-others"
-import CreateRecommendation from "@/components/create-recommendation"
 import Header from "@/components/header"
 
 export default function Home() {
@@ -28,13 +27,6 @@ export default function Home() {
             Recommendations From Others
           </h2>
           <RecommendationsForOthers />
-        </section>
-
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-slate-700 px-1">
-            Create Your Recommendation
-          </h2>
-          <CreateRecommendation />
         </section>
       </div>
     </main>

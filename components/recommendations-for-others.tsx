@@ -5,9 +5,14 @@ import MusicCarousel from "./music-carousel"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import type { RecommendationPost } from "@/types/recommendation"
 import { formatDistanceToNow } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { ChevronRight, PlusCircle } from "lucide-react"
+import Link from "next/link"
+import CreatePostModal from "./create-post-modal"
 
 export default function RecommendationsForOthers() {
   const [selectedPost, setSelectedPost] = useState<RecommendationPost | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [posts, setPosts] = useState<RecommendationPost[]>([
     {
       id: "1",
@@ -163,8 +168,48 @@ export default function RecommendationsForOthers() {
     },
   ])
 
+  const handleCreatePost = (data: { title: string; content: string }) => {
+    const newPost: RecommendationPost = {
+      id: `new-${Date.now()}`,
+      content: data.content,
+      author: "현재사용자", // 실제로는 로그인된 사용자 정보를 사용
+      timestamp: new Date().toISOString(),
+      recommendations: [],
+    }
+
+    setPosts([newPost, ...posts])
+  }
+
   return (
     <>
+      <div className="flex justify-between items-center mb-3 sm:mb-4 px-1">
+        <div></div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-4"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <PlusCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">게시글 작성</span>
+            <span className="sm:hidden">작성</span>
+          </Button>
+
+          <Link href="/all-recommendations">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-4"
+            >
+              <span className="hidden sm:inline">모든 게시글 보기</span>
+              <span className="sm:hidden">전체보기</span>
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       <MusicCarousel
         items={posts}
         visibleItems={6}
@@ -218,12 +263,20 @@ export default function RecommendationsForOthers() {
                       </div>
                     </div>
                   ))}
+
+                  {selectedPost.recommendations.length === 0 && (
+                    <div className="flex items-center justify-center h-32 text-slate-500 text-sm">
+                      아직 추천이 없습니다. 첫 번째 추천을 해보세요!
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      <CreatePostModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} onSubmit={handleCreatePost} />
     </>
   )
 }

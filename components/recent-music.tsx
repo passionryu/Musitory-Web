@@ -6,11 +6,13 @@ import type { MusicItem } from "@/types/music"
 import { formatDistanceToNow } from "date-fns"
 import MusicDetailModal from "./music-detail-modal"
 import { Button } from "@/components/ui/button"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, PlusCircle } from "lucide-react"
 import Link from "next/link"
+import CreatePostModal from "./create-post-modal"
 
 export default function RecentMusic() {
   const [selectedMusic, setSelectedMusic] = useState<MusicItem | null>(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [items, setItems] = useState<MusicItem[]>([
     {
       id: "1",
@@ -102,21 +104,50 @@ export default function RecentMusic() {
     },
   ])
 
+  const handleCreatePost = (data: { title: string; content: string }) => {
+    const newMusic: MusicItem = {
+      id: `new-${Date.now()}`,
+      thumbnail: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop", // 기본 이미지
+      title: data.title,
+      artist: "추가 예정",
+      genre: "미분류",
+      uploader: "현재사용자", // 실제로는 로그인된 사용자 정보를 사용
+      likes: 0,
+      timestamp: new Date().toISOString(),
+      comment: data.content,
+    }
+
+    setItems([newMusic, ...items])
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-3 sm:mb-4 px-1">
         <div></div>
-        <Link href="/all-music">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-4"
+            onClick={() => setShowCreateModal(true)}
           >
-            <span className="hidden sm:inline">모든 게시글 보기</span>
-            <span className="sm:hidden">전체보기</span>
-            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            <PlusCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">게시글 작성</span>
+            <span className="sm:hidden">작성</span>
           </Button>
-        </Link>
+
+          <Link href="/all-music">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 sm:gap-2 text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100 text-xs sm:text-sm px-2 sm:px-4"
+            >
+              <span className="hidden sm:inline">모든 게시글 보기</span>
+              <span className="sm:hidden">전체보기</span>
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <MusicCarousel
@@ -164,6 +195,8 @@ export default function RecentMusic() {
         }}
         onReport={(id) => console.log("Reported:", id)}
       />
+
+      <CreatePostModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} onSubmit={handleCreatePost} />
     </div>
   )
 }
