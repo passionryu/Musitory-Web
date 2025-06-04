@@ -16,6 +16,18 @@ interface MusicDetailModalProps {
   onReport?: (id: string) => void
 }
 
+const formatTimeAgo = (timestamp: string | Date) => {
+  try {
+    const date = typeof timestamp === "string" ? new Date(timestamp) : timestamp
+    if (isNaN(date.getTime())) {
+      return "방금 전"
+    }
+    return formatDistanceToNow(date, { addSuffix: true })
+  } catch (error) {
+    return "방금 전"
+  }
+}
+
 export default function MusicDetailModal({
   music,
   isOpen,
@@ -72,7 +84,7 @@ export default function MusicDetailModal({
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-slate-500 justify-center sm:justify-start">
                   <span>업로드: {music.uploader}</span>
                   <span className="hidden sm:inline">•</span>
-                  <span>{formatDistanceToNow(new Date(music.timestamp), { addSuffix: true })}</span>
+                  <span>{formatTimeAgo(music.timestamp)}</span>
                 </div>
               </div>
 

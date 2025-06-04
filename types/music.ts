@@ -1,12 +1,12 @@
 export interface MusicItem {
   id: string
-  thumbnail: string
   title: string
   artist: string
   genre: string
-  uploader: string
+  thumbnail?: string
   likes: number
-  timestamp: string
+  uploader: string
+  timestamp: string // Ensure this is always a string in ISO format
   comment: string
   isLiked?: boolean
   isBookmarked?: boolean
