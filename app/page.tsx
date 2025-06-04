@@ -9,7 +9,7 @@ export default function Home() {
       <Header />
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent">
-          Musitory
+          Musitory.
         </h1>
 
         <section className="mb-8 sm:mb-12">
