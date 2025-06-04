@@ -2,16 +2,16 @@
 
 ### Dev Flow
 
-```
+\`\`\`
 V0 by vercel -> Github -> Local -> Push -> Github -> (CI/CD) -> Web 
-```
+\`\`\`
 
 ### origin & org Push Method : git pushall
-```
+\`\`\`
 PS C:\Users\rsy\IdeaProjects\Musitory-Web> git config alias.pushall "!git push origin --all && git push org --all"
 >>
 PS C:\Users\rsy\IdeaProjects\Musitory-Web> git pushall
-```
+\`\`\`
 ----
 
 *Automatically synced with your [v0.dev](https://v0.dev) deployments*

@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { User, LogIn } from "lucide-react"
 import LoginModal from "./login-modal"
 import SignupModal from "./signup-modal"
+import MyPageModal from "./mypage-modal"
 
 export default function Header() {
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
+  const [showMyPage, setShowMyPage] = useState(false)
 
   const handleLoginClick = () => {
     setShowLogin(true)
@@ -22,6 +24,10 @@ export default function Header() {
   const handleBackToLogin = () => {
     setShowSignup(false)
     setShowLogin(true)
+  }
+
+  const handleMyPageClick = () => {
+    setShowMyPage(true)
   }
 
   return (
@@ -42,6 +48,7 @@ export default function Header() {
               variant="outline"
               size="sm"
               className="text-slate-600 hover:text-slate-800 border-slate-300 hover:bg-slate-100"
+              onClick={handleMyPageClick}
             >
               <User className="h-4 w-4 mr-2" />
               마이페이지
@@ -53,6 +60,8 @@ export default function Header() {
       <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} onSignupClick={handleSignupClick} />
 
       <SignupModal isOpen={showSignup} onClose={() => setShowSignup(false)} onBackToLogin={handleBackToLogin} />
+
+      <MyPageModal isOpen={showMyPage} onClose={() => setShowMyPage(false)} />
     </>
   )
 }
